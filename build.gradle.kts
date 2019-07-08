@@ -12,13 +12,16 @@ buildscript {
     }
 }
 
-version = "0.0.1-SNAPSHOT"
+group = "dev.roteblume"
+
+val version: String by project
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 plugins {
     idea
     kotlin("jvm") version "1.3.21"
     id("io.gitlab.arturbosch.detekt").version("1.0.0-RC16")
+    `maven-publish`
 }
 
 allprojects {
@@ -75,5 +78,28 @@ detekt {
         inspectionsProfile = "$userHome/.idea/inspect.xml"
         report = "$project.projectDir/reports"
         mask = "*.kt,"
+    }
+}
+
+val nexusUrl: String by project
+val nexusUploadLogin: String by project
+val nexusUploadPassword: String by project
+
+publishing {
+
+    publications {
+        register("mavenJava", MavenPublication::class) {
+            from(components["java"])
+        }
+    }
+
+    repositories {
+        maven {
+            url = uri(nexusUrl)
+            credentials {
+                username = nexusUploadLogin
+                password = nexusUploadPassword
+            }
+        }
     }
 }
